@@ -1,6 +1,7 @@
 package integrations.turnitin.com.membersearcher.controller;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import integrations.turnitin.com.membersearcher.model.MembershipList;
 import integrations.turnitin.com.membersearcher.service.MembershipService;
@@ -20,7 +21,7 @@ public class ApiController {
 	private MembershipService membershipService;
 
 	@GetMapping("/course/members")
-	public CompletableFuture<MembershipList> fetchAllMemberships() {
+	public CompletableFuture<MembershipList> fetchAllMemberships() throws ExecutionException, InterruptedException {
 		return membershipService.fetchAllMembershipsWithUsers();
 	}
 }
