@@ -1,5 +1,6 @@
 package integrations.turnitin.com.membersearcher;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -8,6 +9,7 @@ import integrations.turnitin.com.membersearcher.client.MembershipBackendClient;
 import integrations.turnitin.com.membersearcher.model.Membership;
 import integrations.turnitin.com.membersearcher.model.MembershipList;
 import integrations.turnitin.com.membersearcher.model.User;
+import integrations.turnitin.com.membersearcher.model.UserList;
 import integrations.turnitin.com.membersearcher.service.MembershipService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +31,9 @@ public class MembershipServiceTest {
 
 	@Mock
 	private ObjectMapper objectMapper;
+
+	@Mock
+	private UserList users;
 
 	private MembershipList members;
 
@@ -57,14 +62,17 @@ public class MembershipServiceTest {
 				.setId("2")
 				.setName("test two")
 				.setEmail("test2@example.com");
+		List<User> userList = new ArrayList<>();
+		userList.add(userOne);
+		userList.add(userTwo);
+		users = new UserList().setUsers(userList);
+
+		when(membershipBackendClient.fetchUsers()).thenReturn(CompletableFuture.completedFuture(users));
 		when(membershipBackendClient.fetchMemberships()).thenReturn(CompletableFuture.completedFuture(members));
-		when(membershipBackendClient.fetchUser("1")).thenReturn(CompletableFuture.completedFuture(userOne));
-		when(membershipBackendClient.fetchUser("2")).thenReturn(CompletableFuture.completedFuture(userTwo));
 	}
 
 	@Test
 	public void TestFetchAllMemberships() throws Exception {
-
 		MembershipList members = membershipService.fetchAllMembershipsWithUsers().get();
 		assertThat(members.getMemberships().get(0).getUser()).isEqualTo(userOne);
 		assertThat(members.getMemberships().get(1).getUser()).isEqualTo(userTwo);
